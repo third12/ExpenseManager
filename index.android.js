@@ -10,4 +10,5 @@ import {
 } from 'react-native';
 
 import ExpenseManager from './app/ExpenseManager'
+
 AppRegistry.registerComponent('ExpenseManager', () => ExpenseManager);

@@ -13,21 +13,27 @@ import {
   View
 } from 'react-native';
 import styles from './js/styles.js'
+import Today from './Today.js'
+import Month from './Month.js'
+import Category from './Category.js'
+import FontAwesomeTabBar from './FontAwesomeTabBar.js'
+import Icon from 'react-native-vector-icons/FontAwesome';
+import ScrollableTabView from 'react-native-scrollable-tab-view';
 
 export default class ExpenseManager extends Component {
+
   render() {
     return (
-		<View style={styles.parent}>
-		<View style={styles.child1}>
-		<Text style={styles.child5}> Today </Text>
-		</View>
-		
-		<View style={styles.child2}>
-			<Text style={styles.child5}> Today </Text>
-			<Text style={styles.child5}> Category </Text>
-			<Text style={styles.child5}> Month </Text>
-		</View>
-		</View>
+    	<ScrollableTabView 
+    	tabBarPosition = 'bottom'
+    	renderTabBar = {() => <FontAwesomeTabBar />}
+    	>
+    	
+    	<Today tabLabel='clock-o' />
+    	<Category tabLabel='list' />
+    	<Month tabLabel='calendar' />
+    	</ScrollableTabView>
+
 		);
   }
 }

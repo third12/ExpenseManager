@@ -9,30 +9,45 @@ var styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'stretch',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#0099AA',
-    borderWidth: 5,
-    marginTop: 30
+    backgroundColor: '#F5FCFF',
   },
   
   child1: {
-    flex: 10,
+    flex: 2,
     flexDirection: 'row',
     alignItems: 'stretch',
-    backgroundColor: '#FFFFFF',
   },
+
   child2: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'stretch',
-    backgroundColor: '#FFFFFF',
   },
 
-  
+  list: {
+    flex: 10,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+
+  left: {
+    fontSize: 24,
+  },
+
+  right: {
+    fontSize: 24,
+    textAlign: 'center',
+  },
+
+  textstyle1: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 24
+  },
+
   child5: {
     flex: 1,
     backgroundColor: 'white',
-    borderWidth: 2,
     textAlign: 'center',
     fontSize: 24
 	}
