@@ -12,10 +12,10 @@ import {
   Text,
   View
 } from 'react-native';
-import styles from './js/styles.js'
 import Today from './Today.js'
 import Month from './Month.js'
 import Category from './Category.js'
+import PickerExample from './PickerExample.js'
 import FontAwesomeTabBar from './FontAwesomeTabBar.js'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ScrollableTabView from 'react-native-scrollable-tab-view';

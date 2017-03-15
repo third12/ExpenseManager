@@ -19,13 +19,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#D3D3D3',
   },
 
-  leftArrow: {
-    flex: 1,
-    marginTop: 10,
-  },
-
   top1: {
-    margin: 5,
     flex: 1,
     flexDirection: 'row',
   },
@@ -55,10 +49,15 @@ var styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     fontSize: 20,
-    marginTop: 10,
+    marginTop: 5,
     marginLeft: 5,
   },
-
+  back: {
+    color: 'black',
+    fontSize: 20,
+    marginTop: 5,
+    marginLeft: 5,
+  },
   newExpense: {
     marginTop: 8,
     marginRight: 5,
@@ -84,13 +83,12 @@ var styles = StyleSheet.create({
   expenseForToday: {
     flex: 1,
     flexDirection: 'column',
-    marginTop: 10,
     alignItems: 'center',
+    marginTop: 10,
   },
 
-  TextInputContainer: {
+  leftArrow: {
     flex: 1,
-    flexDirection: 'column',
     marginTop: 10,
   },
 
@@ -101,7 +99,6 @@ var styles = StyleSheet.create({
   },
 
   amount: {
-    flex: 1,
     fontWeight: 'bold',
     color: 'black',
     fontSize: 40,
@@ -114,17 +111,32 @@ var styles = StyleSheet.create({
   header3: {
     flex: 0,
     flexDirection: 'row',
-    backgroundColor: '#D3D3D3',
+    backgroundColor: 'white',
+  },
+
+  button: {
+    marginTop: 5,
+    marginLeft: 130,
+    marginRight: 130,    
   },
 
 
-
   row: {
-    margin: 5,
+    marginLeft: 10,
+    paddingBottom: 20,
     fontWeight: 'bold',
     fontSize: 15,
     color: 'black',
-    backgroundColor: '#D3D3D3',
+    backgroundColor: 'white',
+  },
+  row2: {
+    marginRight: 10,
+    paddingBottom: 20,
+    fontWeight: 'bold',
+    fontSize: 15,
+    color: 'black',
+    backgroundColor: 'white',
+    textAlign: 'right'
   },
 
   foodRow: {
@@ -139,53 +151,11 @@ var styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'black',
   },
+  left: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'black',
+  }
 
-  container: {
-    flex: 1,
-    marginTop: 20,
-  },
-  separator: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: '#8E8E8E',
-  },
-  TextInput: {
-    borderWidth: 1,
-    borderColor: 'black',
-    marginLeft: 20,
-    marginBottom: 5,
-    marginRight: 20,
-    height: 35,
-    lineHeight: 25,
-    color: 'grey',
-  },
-  CategoryPicker: {
-    borderWidth: 1,
-    borderColor: 'black',
-    flex: 0,
-    flexDirection: 'row',    
-    marginLeft: 20,
-    marginBottom: 5,
-    marginRight: 20,
-    height: 35
-  },
-  TextCategory: {
-    margin: 4,
-    color: 'grey',
-  },
-  arrow: {
-    alignItems: 'flex-end',
-  },
-  button: {
-    marginTop: 5,
-    marginLeft: 130,
-    marginRight: 130,    
-  },
-  categories: {
-    margin: 5,
-    color: 'black',
-    fontSize: 15,
-  },
 });
 
 module.exports = styles;
