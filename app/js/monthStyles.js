@@ -16,7 +16,7 @@ var styles = StyleSheet.create({
     flex: 1,
     marginTop: 10,
   },
-  
+
   topContainer: {
     flex: 1,
     flexDirection: 'column',
@@ -50,27 +50,15 @@ var styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
-  todayText: {
+  monthText: {
     fontWeight: 'bold',
     color: 'black',
     fontSize: 20,
     marginTop: 5,
     marginLeft: 5,
   },
-
-  today: {
-    flex: 1,
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor : 'white',
-  },
-
-  category: {
-    flex: 1,
-    alignItems: 'center',    
-  },
-
-  expenseForToday: {
+  
+  expenseForMonth: {
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
@@ -99,31 +87,33 @@ var styles = StyleSheet.create({
     backgroundColor: '#D3D3D3',
   },
 
-
-
   row: {
-    margin: 5,
-    fontWeight: 'bold',
-    fontSize: 15,
-    color: 'black',
-    backgroundColor: '#D3D3D3',
+    flex: 1,
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor : 'black',
   },
 
   leftcolumn: {
-    margin: 10,
-    fontSize: 17,
+    flex:1,
     color: 'black',
+    fontSize: 15,
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft: 5,
   },
 
   rightcolumn: {
-    margin: 10,
-    fontSize: 17,
+    flex:1,
     color: 'black',
     textAlign: 'right',
+    fontSize: 15,
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft: 5,
   },
 
-
-  categoryExpenses: {
+  monthExpenses: {
     flex: 0,
     flexDirection: 'row',
   },
