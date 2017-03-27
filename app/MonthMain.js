@@ -12,14 +12,17 @@ import {
 import styles from './js/monthStyles.js';
 import data from './data.js';
 import moment from 'moment';
-import _ from 'underscore-node';
+import _ from 'underscore';
 
 class MonthMain extends Component {
-  navigate(routeName) {
+
+  navigate(routeName,day) {
     this.props.navigator.push({
-      name: routeName
+      name: routeName,
+      day: day
     });
   }
+
   constructor(props) {
       super(props);
 
@@ -27,7 +30,6 @@ class MonthMain extends Component {
         monthTotal: 0,
         dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
       };
-
       this.getDaysArray = this.getDaysArray.bind(this);      
       this.renderRow = this.renderRow.bind(this);      
       this.getDayTotal = this.getDayTotal.bind(this);      
@@ -35,15 +37,16 @@ class MonthMain extends Component {
     }
 
     componentDidMount() {
-      var currentmonth = moment().format('M');
-      var daysArray = this.getDaysArray(2017,currentmonth);
+      var currentmonth = moment().utcOffset("+08:00").format('M');
+      var year = new Date().getFullYear();
+      var daysArray = this.getDaysArray(year,currentmonth);
       this.setState({dataSource: this.state.dataSource.cloneWithRows(daysArray)});
     }
 
     getDayTotal(day){
       var dayta = data;
       var total = 0;
-      var dayMap = {}; // Create the blank map
+      var dayMap = {}; 
       var dateData = _.where(dayta, {date: day});
       var dateAmount = _.pluck(dateData, 'amount');
 
@@ -55,8 +58,9 @@ class MonthMain extends Component {
     }
 
     getDaysArray(year, month) {
+
       var names = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
-      var currentday = moment().format('D');
+      var currentday = moment().utcOffset("+08:00").format('D');
       var date = new Date(year, month-1, currentday);
       var total = 0;
       console.log(date);
@@ -65,7 +69,7 @@ class MonthMain extends Component {
         var newdate = date.getDate()+" - "+names[date.getDay()];
         var day = month+'/'+date.getDate()+'/'+year;
         var amount = this.getDayTotal(day);
-        var r = {date: newdate, amount: amount};
+        var r = {date: newdate, amount: amount, day:day};
         result.push(r);
         date.setDate(date.getDate()-1);
         total = total + amount;
@@ -91,7 +95,7 @@ class MonthMain extends Component {
       <View style={styles.bottomContainer}>
         <View style={styles.expenseForMonth}>
           <Text style={styles.date}>{date}</Text>
-          <Text style={styles.amount}>{this.state.monthTotal}</Text>
+          <Text style={styles.amount}>₱ {this.state.monthTotal.toFixed(2)}</Text>
         </View>
         
         <View style={styles.expenses}>
@@ -109,10 +113,10 @@ class MonthMain extends Component {
 
   renderRow(data){
     return (
-      <TouchableOpacity onPress={this.navigate.bind(this, "DaySelected")}>
+      <TouchableOpacity onPress={this.navigate.bind(this, "DaySelected",data.day)}>
         <View style={styles.row}>
          <Text style={styles.leftcolumn} >{data.date}</Text>
-         <Text style={styles.rightcolumn} >{data.amount}</Text>
+         <Text style={styles.rightcolumn} >{data.amount.toFixed(2)}</Text>
         </View>
       </TouchableOpacity>
     );

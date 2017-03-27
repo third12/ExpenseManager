@@ -26,8 +26,15 @@ export default class ChooseCategory extends Component {
 			categories: ds.cloneWithRows([
 				'Food', 'Home', 'Personal Care', 'Savings', 'School', 'Transportation'
 			]),
-		}	
+		}
+		this.onPressRow = this.onPressRow.bind(this);
 	}
+
+	onPressRow(item){
+		this.props.setCategory(item);
+		this.props.navigator.pop();
+	}
+
 	render(){
 		return(
 			<View style={styles.parent}>
@@ -47,7 +54,7 @@ export default class ChooseCategory extends Component {
 							dataSource={this.state.categories}
 							renderRow={(rowData) =>
 								<View style={styles.categoryExpenses}>
-									<TouchableOpacity onPress={ ()=>{ this.props.navigator.pop(); console.log('haha'); }}>
+									<TouchableOpacity onPress={ ()=>{ this.onPressRow(rowData) }}>
 									<Text style={styles.categories}>{rowData}</Text>
 									</TouchableOpacity>
 								</View>
