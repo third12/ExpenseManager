@@ -66,8 +66,20 @@ export default class AddExpense extends Component {
 
 	onButtonPress(){
 		var price = this.state.pricePlaceholder;
+		if(isNaN(price) == true){
+			alert('Invalid input on price field.');
+			return false;
+		}
 		var description = this.state.descriptionPlaceholder;
+		if(description == ''){
+			alert('Invalid input on description field.');
+			return false;			
+		}
 		var category = this.state.chosenCategory;
+		if(category == 'Category'){
+			alert('Please choose a category.');
+			return false;
+		}
 		var date = moment().format('M/D/YYYY');
 		var expense ={
 			name: description,			

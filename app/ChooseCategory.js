@@ -9,10 +9,12 @@ import {
   TextInput,
   ListView,
   TouchableOpacity,
+  AsyncStorage,
   Button,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+import _ from 'underscore';
 
 const onButtonPress = () => {
   Alert.alert('Button has been pressed!');
@@ -23,12 +25,45 @@ export default class ChooseCategory extends Component {
 		super(props);
 		const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 		this.state = {
-			categories: ds.cloneWithRows([
+			categorylist: [
 				'Food', 'Home', 'Personal Care', 'Savings', 'School', 'Transportation'
-			]),
+			],
+			categories: ds,
+			data: null
 		}
 		this.onPressRow = this.onPressRow.bind(this);
 	}
+	// componentDidMount() {
+	// 			var categorylist = this.state.categorylist;
+	// 			this.setState({
+	// 				categories: this.state.categories.cloneWithRows(categorylist),	
+	// 			});						
+	// }
+
+	componentWillMount() {
+		AsyncStorage.getItem('categorydata').then((value) => {
+			this.setState({
+				'data': value,
+			})
+		var categories = [];
+		}).then(res => {
+			if(this.state.data != null){
+				var categorylist = this.state.categorylist;
+				var data = JSON.parse(this.state.data);
+				var categoryItems = _.unique(_.pluck(data, 'category'));
+				
+				categoryItems.forEach(function(item) {
+					console.log(item);
+					categorylist.push(item);
+				});
+				
+				this.setState({
+					categories: this.state.categories.cloneWithRows(categorylist),	
+				})				
+			}
+		});		
+	}
+
 
 	onPressRow(item){
 		this.props.setCategory(item);
