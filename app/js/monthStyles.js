@@ -11,7 +11,10 @@ var styles = StyleSheet.create({
     alignItems: 'stretch',
     backgroundColor: '#FFFFFF',
   },
-  
+  loading:{
+    marginTop: 100,
+  },
+
   leftArrow: {
     flex: 1,
     marginTop: 10,

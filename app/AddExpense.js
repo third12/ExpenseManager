@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+import moment from 'moment';
 
 export default class AddExpense extends Component {
 	navigate(routeName){
@@ -28,7 +29,7 @@ export default class AddExpense extends Component {
 			pricePlaceholder: 'Price',
 			descriptionPlaceholder: 'Description',
 			chosenCategory: 'Category',
-			myKey: [],			
+			data: [],			
 		}	
 		this.setCategory = this.setCategory.bind(this);
 		this.onButtonPress = this.onButtonPress.bind(this);
@@ -43,22 +44,23 @@ export default class AddExpense extends Component {
 		// AsyncStorage.clear();
 	}
 
+
 	saveData(expense){
-		AsyncStorage.getItem('myKey').then((value) => {
-			this.setState({'myKey': value});
+		AsyncStorage.getItem('data').then((value) => {
+			this.setState({'data': value});
 		}).then(res => {
-			console.log(this.state.myKey);
-			if(this.state.myKey == null){
+			if(this.state.data == null){
 				expenses = [];
 				expenses.push(expense);
-				AsyncStorage.setItem('myKey', JSON.stringify(expenses));
+				AsyncStorage.setItem('data', JSON.stringify(expenses));
 			}
 			else{
-				expenses = this.state.myKey;
+				expenses = this.state.data;
 				expenses = JSON.parse(expenses);
 				expenses.push(expense)
-				AsyncStorage.setItem('myKey', JSON.stringify(expenses));
+				AsyncStorage.setItem('data', JSON.stringify(expenses));
 			}
+			this.props.navigator.pop();
 		});
 	}
 
@@ -66,13 +68,14 @@ export default class AddExpense extends Component {
 		var price = this.state.pricePlaceholder;
 		var description = this.state.descriptionPlaceholder;
 		var category = this.state.chosenCategory;
+		var date = moment().format('M/D/YYYY');
 		var expense ={
 			name: description,			
 			amount: price,
-			category: category
+			category: category,
+			date: date,
 		};
 		this.saveData(expense);
-		// Alert.alert('Button has been pressed!');
 	}
 
 	render(){
@@ -90,19 +93,18 @@ export default class AddExpense extends Component {
 					</View>
 				</View>
 				<View style={styles.bottomContainer}>
-					<Text>{this.state.myKey}</Text>
 					<View style={styles.TextInputContainer}>				
 						<TextInput
 							underlineColorAndroid="transparent"
 							style={styles.TextInput}
 							onChangeText={(pricePlaceholder) => this.setState({pricePlaceholder})}
-							value={this.state.pricePlaceholder}
+							placeholder={this.state.pricePlaceholder}
 						/>
 						<TextInput
 							underlineColorAndroid="transparent"
 							style={styles.TextInput}
 							onChangeText={(descriptionPlaceholder) => this.setState({descriptionPlaceholder})}
-							value={this.state.descriptionPlaceholder}
+							placeholder={this.state.descriptionPlaceholder}
 						/>
 						<TouchableOpacity onPress={this.navigate.bind(this, "chooseCategory")}>
 						<View style={styles.CategoryPicker}>

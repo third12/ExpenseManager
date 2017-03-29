@@ -19,13 +19,11 @@ import styles from './js/todaystyles.js';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 class TodayMain extends Component {
-	
 	navigate(routeName){
 		this.props.navigator.push({
 			name: routeName
 		});
 	}
-
 	constructor(props){
 		super(props);
 		const ds = new ListView.DataSource({
@@ -34,24 +32,28 @@ class TodayMain extends Component {
 		});
 		this.state = {
 			expenses: 'expenses',
-			loading: false,
-			dataSource: ds.cloneWithRowsAndSections(this.convertFoodArrayToMap()),
+			totalExpense: '0',
+			dataSource: ds.cloneWithRowsAndSections([]),
 		};
 	}
 
-	convertFoodArrayToMap(){
-		AsyncStorage.getItem('myKey').then((value) => {
-			this.setState({'expenses': value});
+	componentWillMount(){
+		// AsyncStorage.clear();
+		AsyncStorage.getItem('data').then((value) => {
+			this.setState({
+				'expenses': value,
+			})
 		}).then(res => {
-			this.setState({loading: true});
 			if(this.state.expenses != null){
-				var food = JSON.parse(this.state.expenses);
+				this.setState({
+					dataSource: this.state.dataSource.cloneWithRowsAndSections(this.convertFoodArrayToMap()),	
+				})				
 			}
-			else{
-				var food = demoData;
-			}			
 		});
-		var food = demoData;
+	}
+
+	convertFoodArrayToMap(){
+		var food = JSON.parse(this.state.expenses);
 		var foodCategoryMap = {}; // Create the blank map
 		food.forEach(function(foodItem) {
 			if (!foodCategoryMap[foodItem.category]) {
@@ -60,13 +62,18 @@ class TodayMain extends Component {
 			} 
 			foodCategoryMap[foodItem.category].push(foodItem);
 		});
+		totalAmount = 0;
 		Object.keys(foodCategoryMap).forEach(function(foodItem) {
 			amount = 0;
 			for(i=0;i < foodCategoryMap[foodItem].length;i++){
-				amount+= foodCategoryMap[foodItem][i].amount;
+				amount += parseFloat(foodCategoryMap[foodItem][i].amount);
 			}
-			foodCategoryMap[foodItem][0].totalexpense = amount;			
+			foodCategoryMap[foodItem][0].totalexpense = amount;	
+			totalAmount += amount;	
 		});
+		this.setState({
+			totalExpense: totalAmount,
+		})
 		return foodCategoryMap;
 	}
 
@@ -92,15 +99,13 @@ class TodayMain extends Component {
 				<View style={styles.header2}>
 						<Text style={styles.row}>{sectionData[0].totalexpense}<Icon name="caret-down" size={20} color="black" /></Text>
 				</View>
-			</View>		
+			</View>	
 		);
 	}
 
 	render() {
-		console.log(this.state.loading);
 		var moment = require('moment');
 		var date = moment().format('MMMM Do YYYY, dddd');
-		if(this.state.loading == true){
 		return (	
 			<View style={styles.parent}>
 			<View style={styles.topContainer}>
@@ -119,7 +124,7 @@ class TodayMain extends Component {
 				<View style={styles.bottomContainer}>
 					<View style={styles.expenseForToday}>
 						<Text style={styles.date}>{date}</Text>
-						<Text style={styles.amount}>360.00</Text>
+						<Text style={styles.amount}>&#8369;{this.state.totalExpense}</Text>
 					</View>
 					<View style={styles.expenses}>
 					    	<ListView
@@ -132,12 +137,6 @@ class TodayMain extends Component {
 			</View>	      
 		      </View>
 	  	);
-		}
-		else{
-			return(
-				<View><Text></Text></View>
-			);
-		}
 	}	
 }
 

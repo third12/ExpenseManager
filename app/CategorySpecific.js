@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 
 import {
-  Button,
-  ListView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+	AsyncStorage,
+  	Button,
+  	ListView,
+  	StyleSheet,
+  	Text,
+  	TouchableOpacity,
+  	View,
 } from 'react-native';
 
+import demoData from './data.js';
 import styles from './js/categorySpecificStyles.js';
 import moment from 'moment';
 import _ from 'underscore';
@@ -24,24 +26,41 @@ class CategorySpecific extends Component {
 		// this.getDaysArray = this.getDaysArray.bind(this);
 	}
 	componentDidMount() {
-		this.setState({dataSource: this.state.dataSource.cloneWithRows(this.categoryMap())})
+		this.setState({
+        	isLoading: true
+      	});
+
+     	 AsyncStorage.getItem('data').then((value) => {
+          	var getData = JSON.parse(value);
+          	this.setState({
+            	data: getData,
+          	});
+         	console.log(value);
+     		}).then(res => {
+        	console.log(res);
+        	if(this.state.data != null){
+          		console.log(this.state.data);
+          		var jdata = this.state.data;
+
+          		this.setState({
+       				dataSource: this.state.dataSource.cloneWithRows(this.categoryMap()),
+            		isLoading: false
+          		});
+        	}
+        	else{
+            	console.log('lol');
+        	}     
+      	});
 	}
 	categoryMap(){
 		var specificCategory = this.props.category;
+		var categoryData = this.state.data;
 		var data = [];
 		var now = moment().format('DD');
-
-		// var today = moment();
-		// var begin = moment().subtract(now-1, 'day');
-		// var dates = [];
-
-		// while(today>=begin){
-		// 	dates.push(begin.format('YYYY/MM/DD'));
-		// 	begin.add(1, 'day');
-		// }
-		// console.log(dates);
 		var todayMonth= moment().format('MMMM YYYY');
-		var dateSpecific = _.unique(_.pluck(categoryData, 'date'));
+		var getByCategory = _.where(categoryData, {category: specificCategory});
+		console.log(getByCategory);
+		var dateSpecific = _.unique(_.pluck(getByCategory, 'date'));
 		var dateSorted = dateSpecific.sort();
 		dateSorted.reverse();
 		// console.log(dateSorted);
@@ -49,16 +68,16 @@ class CategorySpecific extends Component {
 		var itemsPerDay =[];
 		// console.log(dateSpecific);
 		dateSorted.forEach(function(item) {
-			var getMonth = moment(item, 'YYYY/MM/DD');
+			var getMonth = moment(item, 'MM-DD-YYYY');
 			var month = getMonth.format('MMMM YYYY');
 			if(month == todayMonth){	
 				var dateItems = _.where(categoryData, {category: specificCategory, date:item});
 					// console.log(dateItems);					
 				dateItems.forEach(function(dateItem) {
-					sumPerDay+=dateItem.amount;	
+					sumPerDay+=parseInt(dateItem.amount);	
 					itemsPerDay.push({
 						name: dateItem.name,
-						amount: dateItem.amount
+						amount: parseInt(dateItem.amount)
 					});			
 				});
 				// console.log(itemsPerDay);
@@ -68,7 +87,7 @@ class CategorySpecific extends Component {
 					total: sumPerDay,
 					items: itemsPerDay
 				}
-				console.log(dayData);
+				// console.log(dayData);
 				sumPerDay = 0;
 				itemsPerDay = [];
 			}
@@ -85,7 +104,7 @@ class CategorySpecific extends Component {
 	}
 
 	renderRow(categoryItem){
-			var dt = moment(categoryItem.date, "YYYY-MM-DD HH:mm:ss")
+			var dt = moment(categoryItem.date, "MM-DD-YYYY HH:mm:ss")
 			day = dt.format('ddd');
 			// console.log(categoryItem.items);
 		return (
@@ -95,7 +114,7 @@ class CategorySpecific extends Component {
 						 <Text style={styles.row}>{categoryItem.date} - {day}</Text> 
 					</View>
 					<View style={styles.header2}>
-						<Text style={styles.row}>P {categoryItem.total}.00<Icon name="caret-down" size={20} color="black" /></Text>
+						<Text style={styles.row}>₱ {categoryItem.total}.00<Icon name="caret-down" size={20} color="black" /></Text>
 					</View>
 				</View>			
 			    <View>
@@ -114,7 +133,7 @@ renderItems(items) {
 					<Text style={styles.foodRow}>{item.name}</Text> 
 				</View>
 				<View style={styles.header2}>				
-					<Text style={styles.foodRow}>P {item.amount}.00</Text>
+					<Text style={styles.foodRow}>₱{item.amount}.00</Text>
 				</View>
 			</View>	
 	    );
@@ -126,16 +145,17 @@ render() {
 	var today= moment().format('MMMM YYYY');
 	var date = moment().format('MMMM Do YYYY, dddd');
 	var specificCategory = this.props.category;
+	var categoryData = this.state.data;
 	var dates = _.unique(_.pluck(categoryData, 'date'));
 	categorySum = 0;
 	dates.forEach(function(data) {
-		var getMonth = moment(data, 'YYYY/MM/DD');
+		var getMonth = moment(data, 'MM-DD-YYYY');
 		var month = getMonth.format('MMMM YYYY');
 
 		if(month == today){
 			var monthlySum = _.where(categoryData, {date: data, category: specificCategory});
 			monthlySum.forEach(function(date) {
-				categorySum+=date.amount;
+				categorySum+=parseInt(date.amount);
 			});
 			// console.log(categorySum);
 		}		

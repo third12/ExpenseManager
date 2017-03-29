@@ -166,7 +166,13 @@ var styles = StyleSheet.create({
     flex:1,
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#8E8E8E'
-
+  },
+  input: {
+    height: 40,
+    marginTop: 100
+  },
+  loading: {
+    margin: 20
   }
 
 });

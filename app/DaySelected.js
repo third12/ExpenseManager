@@ -9,6 +9,7 @@ import {
   Alert,
   View,
   Navigator,
+  ActivityIndicator,
   AsyncStorage,
   TouchableOpacity
 } from 'react-native';
@@ -28,12 +29,14 @@ class DaySelected extends Component {
           rowHasChanged: (r1, r2) => r1 !== r2,
           sectionHeaderHasChanged: (s1, s2) => s1 !== s2
     });
+    
     this.state = {
       day: this.props.day,
       monthTotal: 0,
       expenses: 'expenses',
-      loading: true,
       dataSource: ds,
+      isLoading: false,
+      data:null,
     };
 
       this.convertFoodArrayToMap = this.convertFoodArrayToMap.bind(this);   
@@ -42,12 +45,34 @@ class DaySelected extends Component {
   }
 
   componentDidMount() {
-    this.setState({dataSource: this.state.dataSource.cloneWithRowsAndSections(this.convertFoodArrayToMap())});
+
+    this.setState({
+      isLoading: true
+    });
+
+    AsyncStorage.getItem('data').then((value) => {
+        var getData = JSON.parse(value);
+        this.setState({
+          data: getData,
+        });
+        console.log(value);
+    }).then(res => {
+      console.log(res);
+      if(this.state.data != null){
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRowsAndSections(this.convertFoodArrayToMap()),
+          isLoading: false
+        });
+      }
+      else{
+          console.log('lol');
+      }     
+    });
   }
 
   convertFoodArrayToMap(){
 
-    var food = demoData;
+    var food = this.state.data;
     var total = 0;
     food = _.where(food, {date: this.props.day});
     console.log(food);
@@ -63,10 +88,10 @@ class DaySelected extends Component {
     Object.keys(foodCategoryMap).forEach(function(foodItem) {
       amount = 0;
       for(i=0;i < foodCategoryMap[foodItem].length;i++){
-        amount+= foodCategoryMap[foodItem][i].amount;
+        amount+= parseInt(foodCategoryMap[foodItem][i].amount);
       }
       foodCategoryMap[foodItem][0].totalexpense = amount;  
-      total = total + amount;   
+      total = total + parseInt(amount);   
     });
     this.setState({monthTotal: total });
     return foodCategoryMap;
@@ -79,7 +104,7 @@ class DaySelected extends Component {
            <Text style={styles.foodRow}>{foodItem.name}</Text> 
         </View>
         <View style={styles.header2}>
-            <Text style={styles.foodRow}>{foodItem.amount.toFixed(2)}</Text>
+            <Text style={styles.foodRow}>{parseInt(foodItem.amount).toFixed(2)}</Text>
         </View>
       </View>   
     );
@@ -103,7 +128,7 @@ class DaySelected extends Component {
     console.log(str);
 
     var date = moment(str, "MM-DD-YYYY").format('MMMM D YYYY, dddd');
-    if(this.state.loading == true){
+    if(this.state.data!=null){
     return (  
       <View style={styles.parent}>
       <View style={styles.topContainer}>
@@ -133,7 +158,10 @@ class DaySelected extends Component {
     }
     else{
       return(
-        <View><Text></Text></View>
+        <ActivityIndicator color='#5ccdcd'
+        size='large'
+        style={styles.loading}
+        /> 
       );
     }
   }
