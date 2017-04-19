@@ -28,30 +28,11 @@ class AddCategory extends Component {
   	onButtonPress(){
 		var category = this.state.categoryPlaceholder;
 		console.log(category);
-		categoryData = {category: category}
-		this.saveCategory(categoryData);
+		categoryData = {category: category};
+		this.props.saveCategory(categoryData);
+		this.props.navigator.pop();
 	}
-	saveCategory(category){
-		AsyncStorage.getItem('categorydata').then((value) => {
-			this.setState({'categories': value});
-		}).then(res => {
-			console.log(JSON.parse(this.state.categories));
-			if(this.state.categories== null){
-				categories = [];
-				categories.push(category);
-				AsyncStorage.setItem('categorydata', JSON.stringify(categories));
-				console.log('data was saved');
-			}
-			else{
-				categories = this.state.categories;
-				categories = JSON.parse(categories);
-				categories.push(category);
-				AsyncStorage.setItem('categorydata', JSON.stringify(categories));
-			}
-			this.props.navigator.pop();
-		});
 
-	}
   	render() {
     	return (
       	<View style={styles.parent}> 

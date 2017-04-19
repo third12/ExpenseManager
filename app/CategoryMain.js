@@ -12,7 +12,6 @@ import {
 	View,
 } from 'react-native';
 
-import demoData from './data.js';
 import styles from './js/categoryStyles.js';
 import moment from 'moment';
 import _ from 'underscore';
@@ -22,54 +21,41 @@ class CategoryMain extends Component {
 	navigate(routeName) {
 		this.props.navigator.push({
 			name: routeName,
+			saveCategory: this.props.saveCategory,
 		});
 	}
 	constructor(props) {
 		super(props); 
 		this.state = {
 			dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2,}),
-			data: null,
-			isLoading: false
-        	
+			expenses: this.props.getExpenses(),
 		}
 		this.onPressRow = this.onPressRow.bind(this);
 	}
-	initData(){
-		
-	}
-	componentDidMount() {
-		
+
+
+	componentWillMount(){
 		this.setState({
-        	isLoading: true
-      	});
-
-      AsyncStorage.getItem('data').then((value) => {
-          var getData = JSON.parse(value);
-          this.setState({
-            data: getData,
-          });
-          // console.log(value);
-      }).then(res => {
-        // console.log(res);
-        if(this.state.data != null){
-          // console.log(this.state.data);
-          var jdata = this.state.data;
-
-          this.setState({
-       		dataSource: this.state.dataSource.cloneWithRows(this.categoryMap()),
-            isLoading: false
-          });
-        }
-        else{
-            console.log('a');
-        }     
-      });
+			expenses: this.props.getExpenses(),
+			dataSource: this.state.dataSource.cloneWithRows(this.categoryMap()),	
+		});
 	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if(this.state.expenses!=this.props.getExpenses()){
+			// console.log('update'+this.props.getExpenses());
+			this.setState({
+				expenses: this.props.getExpenses(),
+				dataSource: this.state.dataSource.cloneWithRows(this.categoryMap()),	
+			});				
+		}
+	}
+
 	categoryMap(){
 		var today= moment().format('MMMM YYYY');
 
 		var data = [];
-		var categoryData = this.state.data;
+		var categoryData = JSON.parse(this.props.getExpenses());
 		var categories = _.unique(_.pluck(categoryData, 'category')).sort();
 
 		categories.forEach(function(category) {
@@ -89,7 +75,7 @@ class CategoryMain extends Component {
 			 }
 			 data.push(c);
 		});
-		console.log(data);
+		// console.log(data);
 		return data;	 
 	}
 	renderRow(categoryItem){
@@ -110,7 +96,8 @@ class CategoryMain extends Component {
 	onPressRow(category) {
 		this.props.navigator.push({
 			name: 'categorySpecific',
-			category: category
+			category: category,
+			getExpenses: this.props.getExpenses,
 		})
 		// console.log(category);
 	}
@@ -123,11 +110,12 @@ class CategoryMain extends Component {
 
 	render() {
 		var content = null;
-		if (this.state.data !== null) {
-			console.log("HOT" + this.state.isLoading);
+		if (this.props.getExpenses() !== null) {
+
 			var moment = require('moment');
 			var today= moment().format('MMMM YYYY');
-			var categoryData = this.state.data;
+			var categoryData = JSON.parse(this.props.getExpenses());
+			// console.log(categoryData);
 			var dates = _.unique(_.pluck(categoryData, 'date'));
 
 			monthSum = 0;
@@ -167,7 +155,8 @@ class CategoryMain extends Component {
 							<ListView
 									dataSource={this.state.dataSource}
 									renderRow={this.renderRow.bind(this)}
-									renderSeparator={this.renderSeparator}							
+									renderSeparator={this.renderSeparator}
+									enableEmptySections={true}							
 							/>                
 						</View>                            
 					</View>
@@ -176,12 +165,29 @@ class CategoryMain extends Component {
 				</View>
 			);
 
-		} else if (this.state.isLoading){
+		} else{
       		content = (
-        		<ActivityIndicator color='#5ccdcd'
-        			size='large'
-        			style={styles.loading}
-       			/> 
+				<View style={styles.parent}>
+					<View style={styles.topContainer}>
+					<View style={styles.top1}>
+						<View style={styles.header1}><Text style={styles.todayText}>Category</Text></View>
+						<View style={styles.header2}>
+							<TouchableOpacity onPress={this.navigate.bind(this, "addCategory")}>
+								<View style={styles.newExpense} >
+									<Icon name="plus" size={20} />
+								</View>
+							</TouchableOpacity>              
+						</View>
+					</View>
+				</View>
+				<View style={styles.bottomContainer} >
+					<View style={styles.expenseForToday}>
+						<Text>{today}</Text>
+						<Text style={styles.amount}>₱0.00</Text>
+					</View>
+				</View>
+					
+				</View>
      		 );
     	}
 

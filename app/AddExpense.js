@@ -21,6 +21,7 @@ export default class AddExpense extends Component {
 		this.props.navigator.push({
 			name: routeName,
 			setCategory: this.setCategory,
+			getCategories: this.props.getCategories,
 		});
 	}	
 	constructor(props){
@@ -33,7 +34,7 @@ export default class AddExpense extends Component {
 		}	
 		this.setCategory = this.setCategory.bind(this);
 		this.onButtonPress = this.onButtonPress.bind(this);
-		this.saveData = this.saveData.bind(this);
+
 	}
 
 	setCategory(item){
@@ -44,26 +45,6 @@ export default class AddExpense extends Component {
 		// AsyncStorage.clear();
 	}
 
-
-	saveData(expense){
-		AsyncStorage.getItem('data').then((value) => {
-			this.setState({'data': value});
-		}).then(res => {
-			if(this.state.data == null){
-				expenses = [];
-				expenses.push(expense);
-				AsyncStorage.setItem('data', JSON.stringify(expenses));
-			}
-			else{
-				expenses = this.state.data;
-				expenses = JSON.parse(expenses);
-				expenses.push(expense)
-				AsyncStorage.setItem('data', JSON.stringify(expenses));
-			}
-			this.props.navigator.pop();
-		});
-	}
-
 	onButtonPress(){
 		var price = this.state.pricePlaceholder;
 		if(isNaN(price) == true){
@@ -71,10 +52,6 @@ export default class AddExpense extends Component {
 			return false;
 		}
 		var description = this.state.descriptionPlaceholder;
-		if(description == ''){
-			alert('Invalid input on description field.');
-			return false;			
-		}
 		var category = this.state.chosenCategory;
 		if(category == 'Category'){
 			alert('Please choose a category.');
@@ -87,7 +64,8 @@ export default class AddExpense extends Component {
 			category: category,
 			date: date,
 		};
-		this.saveData(expense);
+		this.props.saveData(expense);
+		this.props.navigator.pop();
 	}
 
 	render(){

@@ -14,46 +14,56 @@ import {
   TouchableOpacity
 } from 'react-native';
 
-import demoData from './data.js';
 import styles from './js/todaystyles.js';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import moment from 'moment';
+import _ from 'underscore';
+const ds = new ListView.DataSource({
+    	rowHasChanged: (r1, r2) => r1 !== r2,
+    	sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+});
 
 class TodayMain extends Component {
 	navigate(routeName){
 		this.props.navigator.push({
-			name: routeName
+			name: routeName,
+			saveData: this.props.saveData,
+			getCategories: this.props.getCategories,
 		});
 	}
 	constructor(props){
 		super(props);
-		const ds = new ListView.DataSource({
-	      	rowHasChanged: (r1, r2) => r1 !== r2,
-	      	sectionHeaderHasChanged: (s1, s2) => s1 !== s2
-		});
+		// AsyncStorage.clear();
 		this.state = {
-			expenses: 'expenses',
+			expenses: this.props.getExpenses(),
 			totalExpense: '0',
 			dataSource: ds.cloneWithRowsAndSections([]),
 		};
+		
 	}
 
 	componentWillMount(){
-		// AsyncStorage.clear();
-		AsyncStorage.getItem('data').then((value) => {
-			this.setState({
-				'expenses': value,
-			})
-		}).then(res => {
-			if(this.state.expenses != null){
-				this.setState({
-					dataSource: this.state.dataSource.cloneWithRowsAndSections(this.convertFoodArrayToMap()),	
-				})				
-			}
+		this.setState({
+			expenses: this.props.getExpenses(),
+			dataSource: this.state.dataSource.cloneWithRowsAndSections(this.convertFoodArrayToMap()),	
 		});
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		if(this.state.expenses!=this.props.getExpenses()){
+			// console.log('update'+this.props.getExpenses());
+			this.setState({
+				expenses: this.props.getExpenses(),
+				dataSource: this.state.dataSource.cloneWithRowsAndSections(this.convertFoodArrayToMap()),	
+			});				
+		}
+	}
+
 	convertFoodArrayToMap(){
-		var food = JSON.parse(this.state.expenses);
+		var food = JSON.parse(this.props.getExpenses());
+		var day = moment().format('M/D/YYYY');
+        food = _.where(food, {date: day});
+		console.log(food);
 		var foodCategoryMap = {}; // Create the blank map
 		food.forEach(function(foodItem) {
 			if (!foodCategoryMap[foodItem.category]) {
@@ -104,7 +114,6 @@ class TodayMain extends Component {
 	}
 
 	render() {
-		var moment = require('moment');
 		var date = moment().format('MMMM Do YYYY, dddd');
 		return (	
 			<View style={styles.parent}>

@@ -14,7 +14,6 @@ import {
   TouchableOpacity
 } from 'react-native';
 
-import demoData from './data.js';
 import styles from './js/todaystyles.js';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
@@ -33,15 +32,31 @@ class DaySelected extends Component {
     this.state = {
       day: this.props.day,
       monthTotal: 0,
-      expenses: 'expenses',
+      expenses: null,
       dataSource: ds,
-      isLoading: false,
-      data:null,
     };
 
       this.convertFoodArrayToMap = this.convertFoodArrayToMap.bind(this);   
       this.renderRow = this.renderRow.bind(this);
       this.renderSectionHeader = this.renderSectionHeader.bind(this);   
+  }
+
+
+  componentWillMount(){
+    this.setState({
+      expenses: this.props.getExpenses(),
+      dataSource: this.state.dataSource.cloneWithRowsAndSections(this.convertFoodArrayToMap()), 
+    });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if(this.state.expenses!=this.props.getExpenses()){
+      console.log('update'+this.props.getExpenses());
+      this.setState({
+        expenses: this.props.getExpenses(),
+        dataSource: this.state.dataSource.cloneWithRowsAndSections(this.convertFoodArrayToMap()), 
+      });       
+    }
   }
 
   componentDidMount() {
@@ -158,10 +173,23 @@ class DaySelected extends Component {
     }
     else{
       return(
-        <ActivityIndicator color='#5ccdcd'
-        size='large'
-        style={styles.loading}
-        /> 
+      <View style={styles.parent}>
+      <View style={styles.topContainer}>
+        <View style={styles.top1}>
+          <TouchableOpacity onPress={()=>{this.props.navigator.pop()}}>
+          <View style={styles.leftArrow}>
+              <Icon name="chevron-left" size={25} color='black' />    
+          </View>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.bottomContainer}>
+          <View style={styles.expenseForToday}>
+            <Text style={styles.date}>{date}</Text>
+            <Text style={styles.amount}>₱ {0.00}</Text>
+          </View>
+        </View>
+      </View>       
+      </View>
       );
     }
   }

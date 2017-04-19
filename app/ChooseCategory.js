@@ -33,23 +33,27 @@ export default class ChooseCategory extends Component {
 		}
 		this.onPressRow = this.onPressRow.bind(this);
 	}
-	// componentDidMount() {
-	// 			var categorylist = this.state.categorylist;
-	// 			this.setState({
-	// 				categories: this.state.categories.cloneWithRows(categorylist),	
-	// 			});						
-	// }
 
-	componentWillMount() {
-		AsyncStorage.getItem('categorydata').then((value) => {
-			this.setState({
-				'data': value,
-			})
-		var categories = [];
-		}).then(res => {
-			if(this.state.data != null){
+	componentWillMount(){
 				var categorylist = this.state.categorylist;
-				var data = JSON.parse(this.state.data);
+				var data = JSON.parse(this.props.getCategories());
+				var categoryItems = _.unique(_.pluck(data, 'category'));
+				
+				categoryItems.forEach(function(item) {
+					console.log(item);
+					categorylist.push(item);
+				});
+
+		this.setState({
+			data: this.props.getCategories(),
+			categories: this.state.categories.cloneWithRows(categorylist),	
+		});						
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if(this.state.data!=this.props.getCategories()){
+				var categorylist = this.state.categorylist;
+				var data = JSON.parse(this.props.getCategories());
 				var categoryItems = _.unique(_.pluck(data, 'category'));
 				
 				categoryItems.forEach(function(item) {
@@ -58,12 +62,11 @@ export default class ChooseCategory extends Component {
 				});
 				
 				this.setState({
+					data: this.props.getCategories(),
 					categories: this.state.categories.cloneWithRows(categorylist),	
 				})				
-			}
-		});		
+		}
 	}
-
 
 	onPressRow(item){
 		this.props.setCategory(item);

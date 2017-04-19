@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 
 import styles from './js/monthStyles.js';
-import data from './data.js';
 import moment from 'moment';
 import _ from 'underscore';
 
@@ -21,7 +20,8 @@ class MonthMain extends Component {
   navigate(routeName,day) {
     this.props.navigator.push({
       name: routeName,
-      day: day
+      day: day,
+      getExpenses: this.props.getExpenses,
     });
   }
 
@@ -31,51 +31,42 @@ class MonthMain extends Component {
       this.state = {
         monthTotal: 0,
         dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-        data: null,
-        isLoading: false
+        expenses: null,
       };
       this.getDaysArray = this.getDaysArray.bind(this);      
       this.renderRow = this.renderRow.bind(this);      
       this.getDayTotal = this.getDayTotal.bind(this);      
     }
 
+  componentWillMount(){
 
+    var jdata = JSON.parse(this.props.getExpenses());
+    var currentmonth = moment().utcOffset("+08:00").format('M');
+    var year = new Date().getFullYear();
+    var daysArray = this.getDaysArray(year,currentmonth,jdata);
 
-    componentDidMount() {
+    this.setState({
+      expenses: this.props.getExpenses(),
+      dataSource: this.state.dataSource.cloneWithRows(daysArray),  
+    });
+  }
 
+  componentDidUpdate(prevProps, prevState) {
+    if(this.state.expenses!=this.props.getExpenses()){
+      var jdata = JSON.parse(this.props.getExpenses());
+      var currentmonth = moment().utcOffset("+08:00").format('M');
+      var year = new Date().getFullYear();
+      var daysArray = this.getDaysArray(year,currentmonth,jdata);
       this.setState({
-        isLoading: true
-      });
-
-      AsyncStorage.getItem('data').then((value) => {
-          var getData = JSON.parse(value);
-          this.setState({
-            data: getData,
-          });
-          console.log(value);
-      }).then(res => {
-        console.log(res);
-        if(this.state.data != null){
-          console.log(this.state.data);
-          var jdata = this.state.data;
-          var currentmonth = moment().utcOffset("+08:00").format('M');
-          var year = new Date().getFullYear();
-          var daysArray = this.getDaysArray(year,currentmonth);
-
-          this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(daysArray),
-            isLoading: false
-          });
-        }
-        else{
-            console.log('lol');
-        }     
-      });
+        expenses: this.props.getExpenses(),
+        dataSource: this.state.dataSource.cloneWithRows(daysArray),  
+      });       
     }
+  }
 
-    getDayTotal(day){
+    getDayTotal(day,data){
 
-        var dayta = this.state.data;
+        var dayta = data;
         var total = 0;
         var dayMap = {}; 
         var dateData = _.where(dayta, {date: day});
@@ -89,7 +80,7 @@ class MonthMain extends Component {
 
     }
 
-    getDaysArray(year, month) {
+    getDaysArray(year, month,data) {
         var names = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
         var currentday = moment().utcOffset("+08:00").format('D');
         var date = new Date(year, month-1, currentday);
@@ -99,7 +90,7 @@ class MonthMain extends Component {
         while (date.getMonth() == month-1) {
           var newdate = date.getDate()+" - "+names[date.getDay()];
           var day = month+'/'+date.getDate()+'/'+year;
-          var amount = this.getDayTotal(day);
+          var amount = this.getDayTotal(day,data);
           var r = {date: newdate, amount: amount, day:day};
           result.push(r);
           date.setDate(date.getDate()-1);
@@ -112,9 +103,8 @@ class MonthMain extends Component {
 
   render() {
     var content = null;
-    console.log('lo');
-    if (this.state.data !== null) {
-    console.log(this.state.isLoading);
+
+    if (this.props.getExpenses()!== null) {
       var date = moment().format('MMMM YYYY');
       content = (
       <View style={styles.parent}> 
@@ -144,7 +134,7 @@ class MonthMain extends Component {
 
       );  
 
-    } else if (this.state.isLoading){
+    } else{
       content = (
         <ActivityIndicator color='#5ccdcd'
         size='large'

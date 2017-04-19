@@ -10,7 +10,6 @@ import {
   	View,
 } from 'react-native';
 
-import demoData from './data.js';
 import styles from './js/categorySpecificStyles.js';
 import moment from 'moment';
 import _ from 'underscore';
@@ -21,40 +20,31 @@ class CategorySpecific extends Component {
 	constructor(props) {
 		super(props); 
 		this.state = {
+			expenses: null,
 			dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2,}),
 		}
 		// this.getDaysArray = this.getDaysArray.bind(this);
 	}
-	componentDidMount() {
+
+	componentWillMount(){
 		this.setState({
-        	isLoading: true
-      	});
-
-     	 AsyncStorage.getItem('data').then((value) => {
-          	var getData = JSON.parse(value);
-          	this.setState({
-            	data: getData,
-          	});
-         	console.log(value);
-     		}).then(res => {
-        	console.log(res);
-        	if(this.state.data != null){
-          		console.log(this.state.data);
-          		var jdata = this.state.data;
-
-          		this.setState({
-       				dataSource: this.state.dataSource.cloneWithRows(this.categoryMap()),
-            		isLoading: false
-          		});
-        	}
-        	else{
-            	console.log('lol');
-        	}     
-      	});
+			expenses: this.props.getExpenses(),
+			dataSource: this.state.dataSource.cloneWithRows(this.categoryMap()),	
+		});
 	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if(this.state.expenses!=this.props.getExpenses()){
+			this.setState({
+				expenses: this.props.getExpenses(),
+				dataSource: this.state.dataSource.cloneWithRows(this.categoryMap()),	
+			});				
+		}
+	}
+
 	categoryMap(){
 		var specificCategory = this.props.category;
-		var categoryData = this.state.data;
+		var categoryData = JSON.parse(this.props.getExpenses());
 		var data = [];
 		var now = moment().format('DD');
 		var todayMonth= moment().format('MMMM YYYY');
@@ -104,9 +94,9 @@ class CategorySpecific extends Component {
 	}
 
 	renderRow(categoryItem){
-			var dt = moment(categoryItem.date, "MM-DD-YYYY HH:mm:ss")
-			day = dt.format('ddd');
-			// console.log(categoryItem.items);
+		var dt = moment(categoryItem.date, "MM-DD-YYYY HH:mm:ss")
+		day = dt.format('ddd');
+		// console.log(categoryItem.items);
 		return (
 			<View>
 				<View style={styles.header3}>
@@ -141,58 +131,91 @@ renderItems(items) {
 }
 
 render() {
-	var moment = require('moment');
-	var today= moment().format('MMMM YYYY');
-	var date = moment().format('MMMM Do YYYY, dddd');
+	var content = null;
 	var specificCategory = this.props.category;
-	var categoryData = this.state.data;
-	var dates = _.unique(_.pluck(categoryData, 'date'));
-	categorySum = 0;
-	dates.forEach(function(data) {
-		var getMonth = moment(data, 'MM-DD-YYYY');
-		var month = getMonth.format('MMMM YYYY');
+	var today= moment().format('MMMM YYYY');
+	if (this.props.getExpenses() !== null) {
 
-		if(month == today){
-			var monthlySum = _.where(categoryData, {date: data, category: specificCategory});
-			monthlySum.forEach(function(date) {
-				categorySum+=parseInt(date.amount);
-			});
-			// console.log(categorySum);
-		}		
-	});
+		var date = moment().format('MMMM Do YYYY, dddd');
+		var categoryData = JSON.parse(this.props.getExpenses());
+		var dates = _.unique(_.pluck(categoryData, 'date'));
+		categorySum = 0;
+		dates.forEach(function(data) {
+			var getMonth = moment(data, 'MM-DD-YYYY');
+			var month = getMonth.format('MMMM YYYY');
 
+			if(month == today){
+				var monthlySum = _.where(categoryData, {date: data, category: specificCategory});
+				monthlySum.forEach(function(date) {
+					categorySum+=parseInt(date.amount);
+				});
+				// console.log(categorySum);
+			}		
+		});
+
+		content = (
+			<View style={styles.parent}>
+				<View style={styles.topContainer}>
+		          	<View style={styles.top1}>
+		            	<TouchableOpacity onPress={()=>{this.props.navigator.pop()}}>
+			            	<View style={styles.leftArrow}>
+			                	<Icon name="chevron-left" size={25} color='black' />    
+			            	</View>
+		            	</TouchableOpacity>
+			            <View style={styles.header2}>
+			              	<Text style={styles.todayText}>{specificCategory}</Text>
+			            </View>
+		          </View>
+
+				</View>
+				
+				<View style={styles.bottomContainer}>
+					<View style={styles.expenseForToday}>
+						<Text>{today}</Text>
+						<Text style={styles.amount}>P {categorySum}.00</Text>
+					</View>
+					<View style={styles.expenses}>
+						<ListView
+							dataSource={this.state.dataSource}
+							renderRow={this.renderRow.bind(this)}
+							renderSeparator={this.renderSeparator}							
+						/>  
+																		
+					</View>
+				</View>
+			</View>
+		);
+
+	} else{
+		content = (
+			<View style={styles.parent}>
+				<View style={styles.topContainer}>
+		          	<View style={styles.top1}>
+		            	<TouchableOpacity onPress={()=>{this.props.navigator.pop()}}>
+			            	<View style={styles.leftArrow}>
+			                	<Icon name="chevron-left" size={25} color='black' />    
+			            	</View>
+		            	</TouchableOpacity>
+			            <View style={styles.header2}>
+			              	<Text style={styles.todayText}>{specificCategory}</Text>
+			            </View>
+		          </View>
+
+				</View>
+				
+				<View style={styles.bottomContainer}>
+					<View style={styles.expenseForToday}>
+						<Text>{today}</Text>
+						<Text style={styles.amount}>P 0.00</Text>
+					</View>
+				</View>
+			</View>
+		);
+	}
 
  	return (
-
 		<View style={styles.parent}> 
-			<View style={styles.topContainer}>
-	          	<View style={styles.top1}>
-	            	<TouchableOpacity onPress={()=>{this.props.navigator.pop()}}>
-		            	<View style={styles.leftArrow}>
-		                	<Icon name="chevron-left" size={25} color='black' />    
-		            	</View>
-	            	</TouchableOpacity>
-		            <View style={styles.header2}>
-		              	<Text style={styles.todayText}>{specificCategory}</Text>
-		            </View>
-	          </View>
-
-			</View>
-			
-			<View style={styles.bottomContainer}>
-				<View style={styles.expenseForToday}>
-					<Text>{today}</Text>
-					<Text style={styles.amount}>P {categorySum}.00</Text>
-				</View>
-				<View style={styles.expenses}>
-					<ListView
-						dataSource={this.state.dataSource}
-						renderRow={this.renderRow.bind(this)}
-						renderSeparator={this.renderSeparator}							
-					/>  
-																	
-				</View>
-			</View>
+			{content}
 		</View>
 	);
   }

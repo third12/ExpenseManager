@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import {
   AppRegistry,
+  BackAndroid,
   StyleSheet,
   Text,
   View,
@@ -24,6 +25,27 @@ export default class ExpenseManager extends Component {
 
   constructor(props){
     super(props);
+    this.navigator = null;
+
+    this.handleBack = (() => {
+      console.log(this.navigator.getCurrentRoutes());
+      if (this.navigator && this.navigator.getCurrentRoutes().length > 1){
+        this.navigator.pop();
+        return true; //avoid closing the app
+      }
+
+      return false; //close the app
+    }).bind(this)
+  }
+
+
+
+  componentDidMount() {
+    BackAndroid.addEventListener('hardwareBackPress', this.handleBack);
+  }
+
+  componentWillUnmount() {
+    BackAndroid.removeEventListener('hardwareBackPress', this.handleBack);
   }
 
   render() {
@@ -31,6 +53,7 @@ export default class ExpenseManager extends Component {
       <Navigator
           initialRoute={{ name: 'scrollableTab' }}
           renderScene={this.renderScene.bind(this)}
+         ref={navigator => {this.navigator = navigator}}
       />
       );
   }
@@ -44,25 +67,25 @@ export default class ExpenseManager extends Component {
       return <TodayMain navigator={navigator}/>
     }
     if(route.name == 'addExpense') {
-      return <AddExpense navigator={navigator}/>
+      return <AddExpense navigator={navigator} saveData={route.saveData} getCategories={route.getCategories}/>
     }
     if(route.name == 'chooseCategory') {
-      return <ChooseCategory navigator={navigator} setCategory={route.setCategory}/>
+      return <ChooseCategory navigator={navigator} setCategory={route.setCategory} getCategories={route.getCategories}/>
     }
     if(route.name == 'categoryMain') {
       return <CategoryMain navigator={navigator}/>
     }  
     if(route.name == 'addCategory') {
-      return <AddCategory navigator={navigator}/>
+      return <AddCategory navigator={navigator} saveCategory={route.saveCategory} getCategories={route.getCategories}/>
     } 
     if(route.name == 'categorySpecific') {
-      return <CategorySpecific navigator={navigator} category={route.category}/>
+      return <CategorySpecific navigator={navigator} category={route.category} getExpenses={route.getExpenses} />
     } 
     if(route.name == 'MonthMain') {
       return <MonthMain navigator={navigator}/>
     }   
     if(route.name == 'DaySelected') {
-      return <DaySelected navigator={navigator} day={route.day}/>
+      return <DaySelected navigator={navigator} day={route.day} getExpenses={route.getExpenses} />
     }
   }
 }
